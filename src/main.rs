@@ -2,6 +2,7 @@ use std::env;
 mod fetch;
 mod models;
 mod parse;
+mod game_factory;
 
 #[tokio::main]
 async fn main() {

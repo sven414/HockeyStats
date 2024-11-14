@@ -1,6 +1,7 @@
 use regex::Regex;
 use scraper::{Html, Selector};
 use crate::models::game::Game;
+use crate::game_factory::create_game;
 
 /// Extraherar och formaterar tiden från ett tidfält, tar bort datum om det finns.
 fn extract_time(current_date: &str, time_field: &str) -> String {
@@ -44,35 +45,6 @@ fn parse_teams(teams: &str) -> (String, String) {
     } else {
         ("".to_string(), "".to_string())
     }
-}
-
-/// Skapar ett `Game`-objekt med de angivna fälten.
-fn create_game(
-    date: String,
-    time: String,
-    home_team: String,
-    away_team: String,
-    goal_for: Option<u8>,
-    goal_against: Option<u8>,
-    period_result: Option<String>,
-    spectators: Option<u32>,
-    venue: String,
-    league: String,    // Ny parameter för ligan
-    season: String,    // Ny parameter för säsongen
-) -> Game {
-    Game::new(
-        date,
-        time,
-        home_team,
-        away_team,
-        goal_for,
-        goal_against,
-        period_result,
-        spectators,
-        venue,
-        league,
-        season,
-    )
 }
 
 /// Formaterar en sträng så att varje ord börjar med stor bokstav och resten är små.
