@@ -1,4 +1,5 @@
 use regex::Regex;
+use scraper::ElementRef;
 use scraper::{Html, Selector};
 use crate::models::game::Game;
 use crate::game_factory::create_game;
@@ -9,21 +10,6 @@ fn extract_time(current_date: &str, time_field: &str) -> String {
         time_field.replace(current_date, "").split_whitespace().last().unwrap_or("").to_string()
     } else {
         time_field.to_string()
-    }
-}
-
-/// Parsar ett resultatfält till två mål-siffror, `goal_for` och `goal_against`.
-fn parse_result(result: &str) -> (Option<u8>, Option<u8>) {
-    let separator_re = Regex::new(r"[-–]").unwrap();
-
-    if !result.is_empty() && separator_re.is_match(result) {
-        let parts: Vec<&str> = separator_re.split(result).collect();
-        (
-            parts[0].trim().parse::<u8>().ok(),
-            parts[1].trim().parse::<u8>().ok()
-        )
-    } else {
-        (None, None)
     }
 }
 
@@ -88,19 +74,46 @@ fn extract_season(html: &str) -> Option<String> {
     None
 }
 
+/// Extraherar resultat och matchnummer från en cell.
+fn parse_result_and_match_number(cell: &ElementRef) -> (Option<(u8, u8)>, Option<String>) {
+    let number_re = Regex::new(r"/Game/Events/(\d{5,7})").unwrap();
+
+    let link = cell.select(&Selector::parse("a").unwrap())
+        .filter_map(|a| a.value().attr("href"))
+        .next();
+
+    let match_number = link.and_then(|href| {
+        number_re.captures(href).and_then(|cap| cap.get(1).map(|m| m.as_str().to_string()))
+    });
+
+    let result_text = cell.text().collect::<Vec<_>>().join("").trim().to_string();
+    let goal_re = Regex::new(r"(\d+)\s*[–-]\s*(\d+)").unwrap();
+
+    let result = if let Some(captures) = goal_re.captures(&result_text) {
+        let goal_for = captures[1].parse::<u8>().ok();
+        let goal_against = captures[2].parse::<u8>().ok();
+        if let (Some(for_goal), Some(against_goal)) = (goal_for, goal_against) {
+            Some((for_goal, against_goal))
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    (result, match_number)
+}
+
 /// Huvudfunktionen som parser matcher och skapar `Game`-objekt.
 pub fn parse_matches(html: &str) -> Vec<Game> {
     let document = Html::parse_document(&html.replace("\u{00A0}", " "));
-
     let table_selector = Selector::parse("table.tblContent").unwrap();
     let row_selector = Selector::parse("tr").unwrap();
     let cell_selector = Selector::parse("td").unwrap();
 
-    // Anropa subrutiner för att hämta liga och säsong
     let league = extract_league(html).unwrap_or_else(|| "Ingen liga hittad".to_string());
     let season = extract_season(html).unwrap_or_else(|| "Ingen säsong hittad".to_string());
 
-    // Skriv ut liga och säsong för att verifiera resultat
     println!("Liga: {}", league);
     println!("Säsong: {}", season);
 
@@ -111,6 +124,11 @@ pub fn parse_matches(html: &str) -> Vec<Game> {
         for (_index, row) in table.select(&row_selector).enumerate() {
             let cells: Vec<_> = row.select(&cell_selector).collect();
 
+            // Kontrollera att cell[4] inte är tom (ingen match spelad)
+            if cells.len() >= 8 && cells[4].text().collect::<Vec<_>>().join("").trim().is_empty() {
+                continue;
+            }
+
             if cells.len() >= 8 {
                 let first_field = cells[0].text().collect::<Vec<_>>().join("").trim().to_string();
                 let second_field = cells[1].text().collect::<Vec<_>>().join("").trim().to_string();
@@ -118,16 +136,13 @@ pub fn parse_matches(html: &str) -> Vec<Game> {
                 let (date, time) = extract_date_and_time(&first_field, &second_field, &mut current_date);
 
                 let teams = cells[3].text().collect::<Vec<_>>().join("").trim().to_string();
-                let result = cells[4].text().collect::<Vec<_>>().join("").trim().to_string();
+                let (result, match_id) = parse_result_and_match_number(&cells[4]);
+
+                let goal_for = result.map(|(gf, _)| gf);
+                let goal_against = result.map(|(_, ga)| ga);
+
                 let period_result = cells[5].text().collect::<Vec<_>>().join("").trim().to_string();
-
-                let (goal_for, goal_against) = parse_result(&result);
-
-                let period_result = if period_result.is_empty() {
-                    None
-                } else {
-                    Some(period_result)
-                };
+                let period_result = if period_result.is_empty() { None } else { Some(period_result) };
 
                 let spectators = cells[6].text().collect::<Vec<_>>().join("").trim().parse().ok();
                 let venue = cells[7].text().collect::<Vec<_>>().join("").trim().to_string();
@@ -142,6 +157,7 @@ pub fn parse_matches(html: &str) -> Vec<Game> {
                     goal_for,
                     goal_against,
                     period_result,
+                    match_id,
                     spectators,
                     venue,
                     league.clone(),
@@ -155,5 +171,5 @@ pub fn parse_matches(html: &str) -> Vec<Game> {
         println!("Tabell med klassen 'tblContent' hittades inte.");
     }
 
-    matches
+    matches // Returnera vektorn med matcher
 }

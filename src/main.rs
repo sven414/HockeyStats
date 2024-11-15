@@ -3,6 +3,7 @@ mod fetch;
 mod models;
 mod parse;
 mod game_factory;
+mod MatchResult;
 
 #[tokio::main]
 async fn main() {
