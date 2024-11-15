@@ -1,2 +1,2 @@
 pub mod game;
-pub mod streak;
+pub mod team_match;

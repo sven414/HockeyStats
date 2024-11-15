@@ -15,6 +15,7 @@ pub struct Game {
 }
 
 impl Game {
+    // Konstruktor
     pub fn new(
         date: String,
         time: String,
@@ -43,5 +44,54 @@ impl Game {
             league,
             season,
         }
+    }
+
+    // Getter-metoder
+    pub fn date(&self) -> &str {
+        &self.date
+    }
+
+    pub fn time(&self) -> &str {
+        &self.time
+    }
+
+    pub fn home_team(&self) -> &str {
+        &self.home_team
+    }
+
+    pub fn away_team(&self) -> &str {
+        &self.away_team
+    }
+
+    pub fn goal_for(&self) -> Option<u8> {
+        self.goal_for
+    }
+
+    pub fn goal_against(&self) -> Option<u8> {
+        self.goal_against
+    }
+
+    pub fn period_result(&self) -> Option<&str> {
+        self.period_result.as_deref()
+    }
+
+    pub fn match_id(&self) -> Option<&str> {
+        self.match_id.as_deref()
+    }
+
+    pub fn spectators(&self) -> Option<u32> {
+        self.spectators
+    }
+
+    pub fn venue(&self) -> &str {
+        &self.venue
+    }
+
+    pub fn league(&self) -> &str {
+        &self.league
+    }
+
+    pub fn season(&self) -> &str {
+        &self.season
     }
 }
