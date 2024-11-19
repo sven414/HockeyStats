@@ -9,11 +9,13 @@ mod game_factory;
 mod enums;
 mod classify_game_result;
 mod classify_match_type;
+mod win_streak;
 
 use models::team_match::TeamMatch;
 use crate::enums::{HomeAway};
 use classify_game_result::classify_result;
 use classify_match_type::classify_match_type;
+use win_streak::{analyze_win_streaks};
 
 #[tokio::main]
 async fn main() {
@@ -79,13 +81,8 @@ async fn main() {
                         ));
                 }
 
-                // Skriv ut alla matcher per lag
-                for (team, matches) in team_matches_map {
-                    println!("Lag: {}", team);
-                    for match_info in matches {
-                        println!("{}", match_info); // Använder fmt::Display
-                    }
-                }
+                analyze_win_streaks(team_matches_map);
+
             }
         }
         Err(e) => eprintln!("Fel vid hämtning: {}", e),

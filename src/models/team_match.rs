@@ -40,3 +40,25 @@ impl fmt::Display for TeamMatch {
         )
     }
 }
+
+impl TeamMatch {
+    pub fn datetime(&self) -> NaiveDateTime {
+        self.datetime
+    }
+
+    pub fn result(&self) -> MatchResult {
+        self.result.clone()
+    }
+
+    pub fn opponent(&self) -> String {
+        self.opponent.clone()
+    }
+
+    pub fn match_type(&self) -> MatchType {
+        self.match_type.clone()
+    }
+
+    pub fn home_away(&self) -> HomeAway {
+        self.home_away.clone()
+    }
+}
