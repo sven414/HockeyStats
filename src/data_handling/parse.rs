@@ -2,7 +2,7 @@ use regex::Regex;
 use scraper::ElementRef;
 use scraper::{Html, Selector};
 use crate::models::game::Game;
-use crate::game_factory::create_game;
+use crate::models::game_factory::create_game;
 
 /// Extraherar och formaterar tiden från ett tidfält, tar bort datum om det finns.
 fn extract_time(current_date: &str, time_field: &str) -> String {
