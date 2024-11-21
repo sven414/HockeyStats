@@ -1,2 +1,3 @@
 pub mod team_matches;
-pub mod win_streak;
+pub mod find_streak;
+mod output;

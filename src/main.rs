@@ -7,9 +7,10 @@ mod utils;
 
 use data_handling::fetch::fetch_html;
 use data_handling::parse::parse_matches;
-use analytics::win_streak::analyze_win_streaks;
+use analytics::find_streak::analyze_streaks;
 use analytics::team_matches::create_team_matches_map;
 use crate::cli::cli::validate_id;
+use crate::enums::{HomeAway, MatchResult, MatchType};
 
 #[tokio::main]
 async fn main() {
@@ -24,7 +25,20 @@ async fn main() {
                 println!("Inga matcher hittades.");
             } else {
                 let team_matches_map = create_team_matches_map(games);
-                analyze_win_streaks(team_matches_map);
+                analyze_streaks(
+                    team_matches_map.clone(),
+                    MatchResult::Win,
+                    "seger",
+                    None,
+                    None,
+                );
+                analyze_streaks(
+                    team_matches_map.clone(),
+                    MatchResult::Loss,
+                    "förlust",
+                    None,
+                    None,
+                );
             }
         }
         Err(e) => eprintln!("Fel vid hämtning: {}", e),
