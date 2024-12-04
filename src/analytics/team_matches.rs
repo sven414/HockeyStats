@@ -6,6 +6,7 @@
     use crate::utils::classify_game_result::classify_result;
     use crate::utils::classify_match_type::classify_match_type;
 
+    /// Creates a map of team matches from a list of games.
     pub fn create_team_matches_map(games: Vec<Game>) -> HashMap<String, Vec<TeamMatch>> {
         let mut team_matches_map: HashMap<String, Vec<TeamMatch>> = HashMap::new();
 

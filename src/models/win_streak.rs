@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use crate::models::team_match::TeamMatch;
 
-/// Struktur för att representera en vinstsvit
+/// Struktur för att representera en svit
 #[derive(Debug, Clone)]
 pub struct WinStreak {
     team: String,

@@ -4,7 +4,11 @@ use crate::models::team_match::TeamMatch;
 use crate::enums::{MatchResult, HomeAway, MatchType};
 use crate::models::win_streak::WinStreak;
 
-/// Hitta sviter för ett lag baserat på flera parametrar
+/// Finds streaks for a team based on multiple parameters.
+///
+/// This function iterates through a list of matches for a team and identifies streaks
+/// of a specified type (e.g., wins or losses). It can also filter the streaks based on
+/// home/away games and match type. The identified streaks are returned as a vector of `WinStreak` objects.
 fn find_streaks(
     team: &str,
     matches: &[TeamMatch],
@@ -55,7 +59,19 @@ fn find_streaks(
     streaks
 }
 
-/// Analysera sviter baserat på flera parametrar
+/// Analyzes streaks based on multiple parameters.
+///
+/// This function takes a map of team matches and analyzes streaks of a specified type
+/// (e.g., wins or losses) for each team. It can also filter the streaks based on
+/// home/away games and match type. The results are printed to the console.
+///
+/// # Arguments
+///
+/// * `team_matches_map` - A `HashMap` where the key is the team name and the value is a vector of `TeamMatch` objects.
+/// * `streak_type` - The type of streak to analyze (e.g., `MatchResult::Win` or `MatchResult::Loss`).
+/// * `streak_name` - A string representing the name of the streak (e.g., "win" or "loss").
+/// * `home_away` - An optional filter for home or away games (`Some(HomeAway::Home)` or `Some(HomeAway::Away)`).
+/// * `match_type` - An optional filter for the type of match (`Some(MatchType::Regular)` or `Some(MatchType::Overtime)`).
 pub fn analyze_streaks(
     team_matches_map: HashMap<String, Vec<TeamMatch>>,
     streak_type: MatchResult,
