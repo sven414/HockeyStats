@@ -102,5 +102,10 @@ pub fn analyze_streaks(
     all_streaks.reverse();
 
     output::print_top_streaks(&all_streaks, streak_name);
-    output::print_team_streaks(&longest_streaks_per_team, streak_name);
+
+    // Sortera längsta sviter per lag efter lagnamn (alfabetisk ordning)
+    let mut sorted_longest_streaks: Vec<_> = longest_streaks_per_team.into_iter().collect();
+    sorted_longest_streaks.sort_by(|(team_a, _), (team_b, _)| team_a.cmp(team_b));
+
+    output::print_team_streaks(&sorted_longest_streaks, streak_name);
 }

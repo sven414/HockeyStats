@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use crate::models::win_streak::WinStreak;
 
 /// Prints the top 5 longest streaks in the league.
@@ -23,9 +22,12 @@ pub fn print_top_streaks(streaks: &[WinStreak], streak_name: &str) {
 /// This function takes a `HashMap` where the key is the team name and the value is the longest
 /// `WinStreak` object for that team. It prints the longest streaks of a specified type (e.g., wins or losses)
 /// for each team to the console.
-pub fn print_team_streaks(longest_streaks_per_team: &HashMap<String, WinStreak>, streak_name: &str) {
+pub fn print_team_streaks(
+    sorted_longest_streaks: &[(String, WinStreak)],
+    streak_name: &str,
+) {
     println!("\nLängsta {}-sviter per lag:", streak_name);
-    for (team, streak) in longest_streaks_per_team {
+    for (team, streak) in sorted_longest_streaks {
         println!(
             "Lag: {}, Längd: {}, Start: {}, Slut: {}",
             team,
@@ -35,3 +37,4 @@ pub fn print_team_streaks(longest_streaks_per_team: &HashMap<String, WinStreak>,
         );
     }
 }
+
