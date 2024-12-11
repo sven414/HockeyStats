@@ -47,7 +47,7 @@ fn format_title_case(text: &str) -> String {
         .join(" ")
 }
 
-/// Extraherar namnet på ligan från `<title>`-taggen i HTML och formaterar det med stor bokstav i början av varje ord.
+/// Extraherar namnet på ligan från `<title>`-taggen i HTML.
 fn extract_league(html: &str) -> Option<String> {
     let document = Html::parse_document(html);
     let title_selector = Selector::parse("title").unwrap();
@@ -57,7 +57,12 @@ fn extract_league(html: &str) -> Option<String> {
         // Dela på '|' och trimma resultatet
         let parts: Vec<&str> = title_text.split('|').collect();
         if let Some(league) = parts.get(0) {
-            return Some(format_title_case(league.trim()));
+            let league_trimmed = league.trim();
+            if league_trimmed.len() > 4 {
+                return Some(format_title_case(league_trimmed));
+            } else {
+                return Some(league_trimmed.to_string());
+            }
         }
     }
     None
