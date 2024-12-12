@@ -129,7 +129,6 @@ pub fn parse_matches(html: &str) -> Vec<Game> {
         for (_index, row) in table.select(&row_selector).enumerate() {
             let cells: Vec<_> = row.select(&cell_selector).collect();
 
-            // Kontrollera att cell[4] inte är tom (ingen match spelad)
             if cells.len() >= 8 && cells[4].text().collect::<Vec<_>>().join("").trim().is_empty() {
                 continue;
             }
@@ -137,7 +136,6 @@ pub fn parse_matches(html: &str) -> Vec<Game> {
             if cells.len() >= 8 {
                 let first_field = cells[0].text().collect::<Vec<_>>().join("").trim().to_string();
                 let second_field = cells[1].text().collect::<Vec<_>>().join("").trim().to_string();
-
                 let (date, time) = extract_date_and_time(&first_field, &second_field, &mut current_date);
 
                 let teams = cells[3].text().collect::<Vec<_>>().join("").trim().to_string();
@@ -176,5 +174,5 @@ pub fn parse_matches(html: &str) -> Vec<Game> {
         println!("Tabell med klassen 'tblContent' hittades inte.");
     }
 
-    matches // Returnera vektorn med matcher
+    matches
 }

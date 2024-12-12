@@ -1,34 +1,56 @@
-pub fn validate_id(args: &[String]) -> String {
+use super::help_output;
+
+pub fn validate_args(args: &[String]) -> (String, bool, bool, bool) {
     if args.len() < 2 {
-        print_help_and_exit(); // Skriv ut hjälp om inga argument anges.
+        help_output::print_help_and_exit();
     }
 
-    let arg = &args[1];
-    if arg == "--help" {
-        print_help_and_exit();
-    } else if arg == "--version" {
-        print_version_and_exit();
+    let mut analyze_win = true;
+    let mut analyze_loss = false;
+    let mut show_all_teams = false;
+
+    for arg in &args[2..] {
+        if arg.starts_with('-') && !arg.starts_with("--") {
+            for flag in arg.chars().skip(1) {
+                match flag {
+                    'w' => analyze_win = true,
+                    'l' => analyze_loss = true,
+                    't' => show_all_teams = true,
+                    _ => {
+                        eprintln!("Error: Unknown flag '-{}'.", flag);
+                        std::process::exit(1);
+                    }
+                }
+            }
+        } else if arg.starts_with("--") {
+            match arg.as_str() {
+                "--win" => analyze_win = true,
+                "--lose" => analyze_loss = true,
+                "--allteams" => show_all_teams = true,
+                "--help" => {
+                    help_output::print_help_and_exit();
+                    unreachable!();
+                }
+                "--version" => {
+                    help_output::print_version_and_exit();
+                    unreachable!();
+                }
+                _ => {
+                    eprintln!("Error: Unknown flag '{}'.", arg);
+                    std::process::exit(1);
+                }
+            }
+        } else {
+            eprintln!("Error: Unknown argument '{}'.", arg);
+            std::process::exit(1);
+        }
     }
 
-    // Validera om det är ett femsiffrigt nummer.
-    if arg.len() != 5 || !arg.chars().all(|c| c.is_digit(10)) {
-        eprintln!("Fel: Argumentet måste vara ett femsiffrigt nummer.");
+    let id = args[1].clone();
+    if id.len() != 5 || !id.chars().all(|c| c.is_digit(10)) {
+        eprintln!("Error: ID must be a five-digit number.");
         std::process::exit(1);
     }
-    arg.clone()
-}
 
-fn print_help_and_exit() {
-    println!("Användning: hockeystats <ID>");
-    println!("Ett CLI-verktyg för att analysera hockeystatistik.");
-    println!();
-    println!("Flaggor:");
-    println!("  --help       Visar denna hjälptext.");
-    println!("  --version    Visar programversionen.");
-    std::process::exit(0);
-}
-
-fn print_version_and_exit() {
-    println!("hockeystats version {}", env!("CARGO_PKG_VERSION"));
-    std::process::exit(0);
+    (id, analyze_win, analyze_loss, show_all_teams)
 }
